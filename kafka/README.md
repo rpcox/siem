@@ -8,7 +8,7 @@ The components are:
 * OpenJDK 17.0.14
 * Kafka 2.13-4.0.0
 
-![image](png/kafka.drawio.png)
+![image](png/dragons.drawio.png)
 
 
 ### installation
