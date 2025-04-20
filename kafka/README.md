@@ -17,7 +17,8 @@ The components are:
 2. Install Kakfka
 3. Install systemd unit file and leave disabled
 4. Configure the broker/controllers (see configs)
-5. Generate a cluster ID
+* Comment out advertised.listeners
+6. Generate a cluster ID
 * KAFKA_CLUSTER_ID=$(bin/kafka-storage.sh random-uuid)
 * Keep in case you need to reformat one node
 6. Format storage
