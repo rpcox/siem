@@ -1,0 +1,5 @@
+#!/bin/bash
+
+/usr/bin/systemctl status syslog-ng &> /dev/null
+exit $?
+

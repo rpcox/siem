@@ -1,0 +1,109 @@
+#!/usr/bin/perl
+
+use 5.014;
+
+my $conf = '/etc/keepalived/keepalived.conf';
+my ($fh, $ips, $peers);
+
+open($fh, '<', $conf) or say "fail to open $conf\n" and exit 1;
+
+# -----------------------------
+# Some configs may have multiple IPs in some stanzas
+#
+
+sub getIPs {
+	my $fh = shift;
+	my ($end, %ips) = 0;
+	while ( my $line = <$fh> ) {
+		if ( $line =~ /\}/ ) {
+			$end = 1;
+		} elsif ( $line =~ /((\d{1,3}\.){3}\d+)/ ) {
+			$ips{$1} = '';
+		}
+
+		last if $end;
+	}
+
+	return \%ips;
+}
+
+# -----------------------------
+# Check keepalived status
+#
+
+my @pid = `pgrep keepalived`;
+
+if ( not defined $pid[0] ) {
+	printf '%10s: %s', 'keepalived', "DOWN\n";
+	exit 3;
+} else {
+	foreach (@pid) { $_ =~ s/\n// }
+	printf '%10s:%s%s%s', 'keepalived', ' PIDs => ', join(',', @pid), "\n\n";
+}
+
+
+printf '%16s%10s%10s%8s%20s%10s%11s%25s%s', 'VIP', 'STATUS', 'STATE', 'PRI', 'INSTANCE', 'IFACE', 'ROUTER ID', 'TRACKING', "\n";
+printf '%110s%s', '-' x 108, "\n";
+
+
+# -----------------------------
+# Parse the config
+#
+
+while (<$fh>) {
+	if ( /vrrp_instance\s+(.*)\s+{/ ) {
+		my ($instance, $state, $iface, $router_id, $priority, $track) = $1;
+		my $end = 0;
+
+		while (my $line = <$fh>) {
+			if ( $line =~ /^}/ ) {
+				$end = 1;
+			} elsif ( $line =~ /state\s+(.*)/ ) {
+				$state = $1;
+			} elsif ( $line =~ /interface\s+(.*)/ ) {
+				$iface = $1;
+			} elsif ( $line =~ /router_id\s+(.*)/ ) {
+				$router_id = $1;
+			} elsif ( $line =~ /priority\s+(.*)/ ) {
+				$priority = $1;
+			} elsif ( $line =~ /virtual_ipaddress\s+(.*)/ ) {
+				$ips = getIPs($fh);
+			} elsif ( $line =~ /track_script\s+(.*)/ ) {
+				$line = <$fh>;
+				$track = $1 if ( $line =~ /\s+([\w-]+)/ );
+				$line = <$fh>;
+			} elsif ( $line =~ /unicast_peer/ ) {
+				$peers = getIPs($fh);
+			}
+
+			last if $end;
+		}
+
+		# Get the IPs assigned to the interface
+		# > ip -br a
+		# lo               UNKNOWN        127.0.0.1/8
+		# eth0             UP             192.168.245.52/24 192.168.245.6/32 192.168.245.5/32
+		# wlan0            DOWN
+		#
+		my @ipbra = `ip -br a`;
+
+		foreach my $row (@ipbra) {
+			if ( $row =~ /$iface/ ) { # if interface name in row
+				foreach my $ip ( keys %{$ips} ) {
+					if ( $row =~ /$ip/ ) {
+						$ips->{$ip} = "ACTIVE"
+					} else {
+						$ips->{$ip} = "      "
+					}
+				}
+			}
+		}
+
+		my @ip = keys %{$ips};
+		printf '%16s%10s%10s%8s%20s%10s%11s%25s%s', $ip[0], $ips->{$ip[0]}, $state, $priority, $instance, $iface, $router_id, $track, "\n";
+
+	}
+
+}
+
+print "\n"

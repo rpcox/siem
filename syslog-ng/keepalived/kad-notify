@@ -1,0 +1,3 @@
+#!/bin/bash
+
+/usr/bin/logger -n 127.0.0.1 -p local0.warn -t kad-notify "$1 $2 host transitioned to the $4 state with a priority of $4"
