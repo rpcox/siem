@@ -60,7 +60,7 @@ Pull the topic description
 
 Produce
 
-    > kafka-console-producer.sh --topic test.topic --bootstrap-server mushu:9092
+    > bin/kafka-console-producer.sh --topic test.topic --bootstrap-server mushu:9092
     >one
     >two
     >three
@@ -69,7 +69,7 @@ Produce
 
 Consume
 
-    > kafka-console-consumer.sh --topic test.topic --bootstrap-server smaug:9092 --from-beginninging
+    > bin/kafka-console-consumer.sh --topic test.topic --bootstrap-server smaug:9092 --from-beginning
     one
     two
     three
