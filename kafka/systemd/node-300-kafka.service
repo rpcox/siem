@@ -1,5 +1,5 @@
 [Unit]
-Description=Apache Kafka
+Description=Apache Kafka 2.13-4.1.0
 Documentation=http://kafka.apache.org/documentation.html
 Requires=network.target remote-fs.target
 Wants=network-online.target
