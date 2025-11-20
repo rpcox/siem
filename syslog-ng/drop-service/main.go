@@ -33,7 +33,7 @@ func main() {
 					return
 				} else {
 					fmt.Println(err)
-					os.Exit(1)
+					continue
 				}
 			}
 
