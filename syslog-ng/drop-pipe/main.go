@@ -28,6 +28,7 @@ func sigHandler(sigChan chan os.Signal, done chan interface{}) {
 	for sig := range sigChan {
 		if sig == syscall.SIGTERM || sig == syscall.SIGINT {
 			close(done)
+			return
 		}
 	}
 }
