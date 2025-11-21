@@ -1,4 +1,4 @@
-// syslog-ng forwards records to this program via stdin (through a shell)
+// proof of concept - syslog-ng forwards records to this program via stdin (through a shell)
 package main
 
 import (

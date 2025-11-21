@@ -1,6 +1,6 @@
 ## drop-stdin
     
-An example of using a syslog-ng destination program.
+A proof of concept example of using a syslog-ng destination program.
     
 ### syslog-ng config
     
