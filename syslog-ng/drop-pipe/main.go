@@ -1,4 +1,4 @@
-// syslog-ng forwards records to this program via a named pipe
+// proof of concept - syslog-ng forwards records to this program via a named pipe
 package main
 
 import (
