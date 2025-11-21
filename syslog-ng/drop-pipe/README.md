@@ -2,6 +2,14 @@
 
 A proof of concept example of using a named pipe w/ syslog-ng destination program.
 
+
+### bug
+
+When trying to stop syslog-ng (systemctl stop syslog-ng) it hung. I had to find drop-pipe in the process table and send a SIGKILL, then syslog-ng promptly stopped.
+
+Using systemctl start/stop drop-pipe works fine. Issue is related to syslog-ng. May need to change out the shutdown command.
+
+
 ### syslog-ng config
 
 
@@ -72,8 +80,3 @@ Check the logs on relay
     <123>2025-11-21T12:34:56Z spud nodrop: DON'T DROP THIS
     
 
-### bug
-
-When trying to stop syslog-ng (systemctl stop syslog-ng) it hung. I had to find drop-pipe in the process table and send a SIGKILL, then syslog-ng promptly stopped.
-
-Using systemctl start/stop drop-pipe works fine. Issue is related to syslog-ng. May need to change out the shutdown command.
