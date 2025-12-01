@@ -51,5 +51,6 @@ func OpenNamedPipe(pipeName string) *os.File {
 		os.Exit(ErrNPipeOpen)
 	}
 
+	fmt.Fprintf(os.Stderr, "%s %s\n", s, pipeName)
 	return fh
 }
