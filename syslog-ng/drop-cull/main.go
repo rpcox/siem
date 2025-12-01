@@ -39,18 +39,8 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1, syscall.SIGUSR2)
 	go sigHandler(sigChan, done)
 
-	for {
-		select {
-		case <-done:
-			fmt.Fprintf(os.Stderr, "exiting\n")
-			if err := os.Remove(*_readPipe); err != nil {
-				fmt.Fprintf(os.Stderr, "remove read pipe on exit: %v\n", err)
-			}
-			if err := os.Remove(*_writePipe); err != nil {
-				fmt.Fprintf(os.Stderr, "remove write pipe on exit: %v\n", err)
-			}
-			return
-		default:
+	go func() {
+		for {
 			line, err := reader.ReadBytes('\n')
 			if err != nil {
 				m.ReadErrorCount++
@@ -69,6 +59,15 @@ func main() {
 				m.DropWriteCount++
 			}
 		}
-	}
 
+	}()
+
+	<-done
+	fmt.Fprintf(os.Stderr, "exiting\n")
+	if err := os.Remove(*_readPipe); err != nil {
+		fmt.Fprintf(os.Stderr, "remove read pipe on exit: %v\n", err)
+	}
+	if err := os.Remove(*_writePipe); err != nil {
+		fmt.Fprintf(os.Stderr, "remove write pipe on exit: %v\n", err)
+	}
 }
